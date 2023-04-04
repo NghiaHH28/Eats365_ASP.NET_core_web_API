@@ -19,21 +19,29 @@ namespace EATS365_Library.DTO
         }
 
         public string ProductId { get; set; }
-        [Required]
-        [MaxLength(100)]
+
+        [Required(ErrorMessage = "Tên sản phẩm không được bỏ trống!")]
+        [MaxLength(100, ErrorMessage = "Tên sản phẩm phải dưới 100 ký tự")]
+        [RegularExpression("^[\\p{L} \\.'\\-]{2,}( [\\p{L} \\.'\\-]+)+$", ErrorMessage = "Tên sản phẩm phải có từ 2 từ trở lên!")]
         public string ProductName { get; set; }
-        [Required]
-        [MaxLength(500)]
+
+        [Required(ErrorMessage = "Mô tả sản phẩm không được bỏ trống!")]
+        [MaxLength(500, ErrorMessage = "Mô tả sản phẩm phải dưới 500 từ!")]
         public string ProductDescription { get; set; }
-        [Required]
-        [Range(0, 1000000)]
+
+        [Required(ErrorMessage = "Giá sản phẩm không được bỏ trống!")]
+        [Range(0, 1000000, ErrorMessage = "Giá sản phẩm phải từ 0VND đến 1.000.000VND!")]
         public int ProductPrice { get; set; }
-        [Required]
-        [Range(0, 100)]
+
+        [Required(ErrorMessage = "Phẩn trăm giảm giá không được bỏ trống!")]
+        [Range(0, 100, ErrorMessage = "Phần trăm giảm giá phải từ 0 đến 100!")]
         public int ProductSalePercent { get; set; }
+
         public string ProductStatus { get; set; }
-        [Required]
+
+        [Required(ErrorMessage = "Hình ảnh không được bỏ trống!")]
         public string ProductImage { get; set; }
+
         public string CategoryId { get; set; }
 
         public virtual CategoryDTO Category { get; set; }

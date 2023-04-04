@@ -18,27 +18,33 @@ namespace EATS365_Library.DTO
             Schedules = new HashSet<ScheduleDTO>();
         }
         public string AccountId { get; set; }
-        [Required]
-        [MaxLength(100)]
-        [RegularExpression("^\\w+([.-]?\\w+)*@\\w+([.-]?\\w+)*(\\.\\w{2,3})+$")]
+
+        [Required(ErrorMessage = "Email không được bỏ trống!")]
+        [MaxLength(100, ErrorMessage = "Email phải dưới 100 ký tự!")]
+        [RegularExpression("^\\w+([.-]?\\w+)*@\\w+([.-]?\\w+)*(\\.\\w{2,3})+$", ErrorMessage = "Email không đúng định dạng!")]
         public string AccountEmail { get; set; }
-        [Required]
-        [MaxLength(100)]
-        [RegularExpression("^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*[^\\w\\s]).{6,}$")]
+
+        [Required(ErrorMessage = "Mật khẩu không được bỏ trống!")]
+        [MaxLength(100, ErrorMessage = "Mật khẩu phải dưới 100 ký tự!")]
+        [RegularExpression("^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*[^\\w\\s]).{6,}$", ErrorMessage = "Email phải trên 6 " +
+            "ký tự bao gồm ít nhất 1 chữ hoa, 1 chữ thường, 1 ký tự đặc biệt và số!")]
         public string AccountPassword { get; set; }
+
         public string AccountStatus { get; set; }
-        [Required]
-        [MaxLength(100)]
-        [RegularExpression("^[\\p{L} \\.'\\-]{2,}( [\\p{L} \\.'\\-]+)+$")]
+
+        [Required(ErrorMessage = "Tên không được bỏ trống!")]
+        [MaxLength(100, ErrorMessage = "Tên phải dưới 100 ký tự!")]
+        [RegularExpression("^[\\p{L} \\.'\\-]{2,}( [\\p{L} \\.'\\-]+)+$", ErrorMessage = "Tên phải có từ 2 từ trở lên!")]
         public string AccountName { get; set; }
-        [Required]
-        [MaxLength(200)]
+
+        [Required(ErrorMessage = "Địa chỉ không được bỏ trống!")]
+        [MaxLength(200, ErrorMessage = "Địa chỉ phải dưới 200 ký tự!")]
         public string AccountAddress { get; set; }
-        [Required]
-        [MaxLength(10)]
-        [RegularExpression("^0\\d{9}$")]
+
+        [Required(ErrorMessage = "Số điện thoại không được bỏ trống!")]
+        [RegularExpression("^0\\d{9}$", ErrorMessage = "Số điện thoại không đúng định dạng!")]
         public string AccountPhone { get; set; }
-        [Required]
+
         public DateTime AccountBirthDay { get; set; }
         public DateTime AccountStartDate { get; set; }
         public DateTime? AccountEndDate { get; set; }
