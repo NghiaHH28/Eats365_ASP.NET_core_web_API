@@ -1,66 +1,94 @@
 ﻿@using Microsoft.AspNetCore.Http;
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - EATS365_Web_Admin</title>
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="~/css/site.css" />
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="~/lib/font-awesome/css/all.css" type="text/css">
+    <link rel="stylesheet" href="~/lib/font-awesome/js/all.js" type="text/javascript">
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css" type="text/css">
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/js/bootstrap.js" type="text/javascript">
+    <link rel="stylesheet" href="~/css/base.css" type="text/css">
+    <title>Login</title>
 </head>
 <body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">EATS365_Web_Admin</a>
-                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
+    <nav class="navbar navbar-expand-lg">
+        <div class="container-fluid nav-wrapper" style="position: relative !important;">
+            <a href="">
+                <img class="navbar-logo" src="~/img/Logo.png" alt="">
+            </a>
+            <div class="collapse navbar-collapse" id="navbarScroll" style="position: absolute !important;right: 0px !important;">
+                <ul class="navbar-nav ms-auto my-2 my-lg-0 navbar-nav-scroll">
+                    <li class="nav-item">
+                        <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">
+                            <i class="fa-solid fa-house"></i>
+                            Home
+                        </a>
+                    </li>
+                    @if (Context.Session != null && Context.Session.GetString("AccountID") != null && Context.Session.GetString("AccountID").Equals("AD0001"))
+                    {
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Product" asp-action="Index">
+                                <i class="fa-sharp fa-solid fa-file-invoice-dollar"></i>
+                                Manage Product
+                            </a>
                         </li>
-                        @if (Context.Session != null && Context.Session.GetString("AccountID") != null && Context.Session.GetString("AccountID").Equals("AD0001"))
-                        {
-                            <li class="nav-item">
-                                <a class="nav-link text-dark">
-                                    Xin chào @Context.Session.GetString("AccountName")
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-controller="Login" asp-action="Logout">
-                                    Logout
-                                </a>
-                            </li>
-                        }
-                        else
-                        {
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-controller="Login" asp-action="Index">
-                                    Login
-                                </a>
-                            </li>
-                        }
-                    </ul>
-                </div>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Order" asp-action="Index">
+                                <i class="fa-sharp fa-solid fa-file-invoice-dollar"></i>
+                                Manage Order
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="User" asp-action="Index">
+                                <i class="fa-solid fa-user-group"></i>
+                                Manage User
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Staff" asp-action="Index">
+                                <i class="fa-sharp fa-solid fa-user-tie"></i>
+                                Manage Staff
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-controller="Logout" asp-action="Index">
+                                <i class="fa-solid fa-right-from-bracket"></i>
+                                Logout
+                            </a>
+                        </li>
+                    }
+                    else
+                    {
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-controller="login" asp-action="Index">
+                                <i class="fa-sharp fa-solid fa-right-to-bracket"></i>
+                                Login
+                            </a>
+                        </li>
+                    }
+                </ul>
             </div>
-        </nav>
-    </header>
-    <div class="container">
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
+        </div>
+    </nav>
+
+    <div class="container-fluid wrapper">
+        @RenderBody()
     </div>
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2023 - EATS365_Web_Admin - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+    <div class="container-fluid footer">
+        <div class="row">
+            <div class="col-md-12">
+                <span class="footer-copycript text-center">
+                    &copy; 2023 - G1FOOD_Web_Admin -
+                    <a class="footer-link" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+
+                </span>
+            </div>
         </div>
-    </footer>
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    </div>
     <script src="~/js/site.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>

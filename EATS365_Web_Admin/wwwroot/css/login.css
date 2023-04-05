@@ -1,0 +1,104 @@
+/* Form base css */
+.container-fluid {
+    padding-left: 0;
+    padding-right: 0;
+}
+
+.container-fluid-form {
+    height: 600px !important;
+    background-color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 18px;
+    font-family: unset !important;
+    margin-bottom: 94px;
+}
+
+.wrapper-form {
+    width: 400px;
+    background-color: var(--background-color);
+    padding: 26px;
+    border-radius: 4px;
+    box-shadow: 1px 1px 4px 4px #999;
+}
+
+.form-heading-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+    .form-heading-group i {
+        color: var(--text-color);
+        font-size: 24px;
+        border-radius: 50%;
+        border: 2px solid #ddd;
+        padding: 12px 14px;
+        background-color: var(--primary-color);
+    }
+
+.form-heading {
+    margin: 10px 0 6px 0;
+    font-size: 30px;
+    font-weight: 400;
+    text-shadow: 2px 3px 2px rgba(0, 0, 0, 0.3), 0px -4px 10px rgba(255, 255, 255, 0.3);
+}
+
+.form-control-group {
+    margin-bottom: 8px;
+}
+
+.form-text-label {
+    font-size: 18px;
+    margin-bottom: 4px;
+    font-weight: bold;
+    color: #555;
+}
+
+.form-caption {
+    margin-top: 12px;
+}
+
+.form-text-caption, .form-link {
+    font-size: 18px;
+    text-decoration: none;
+    margin-right: 4px;
+    margin-bottom: 0px;
+}
+
+.form-control-group input, .form-control-group select {
+    width: 100%;
+    height: 38px;
+    font-size: 18px;
+    padding: 0px 12px;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+.form-btn-group {
+    margin-top: 20px;
+}
+
+.form-btn-separator {
+    display: flex;
+    flex-direction: row;
+    color: rgb(134, 134, 134);
+    font-size: 14px;
+    margin: 4px 0px;
+}
+
+    .form-btn-separator:before,
+    .form-btn-separator:after {
+        content: "";
+        flex: 1 1;
+        border-bottom: 2px solid rgb(134, 134, 134);
+        margin: auto;
+    }
+
+.alert-warning {
+    margin-top: 4px;
+    font-size: 18px;
+    color: var(--main-color);
+}

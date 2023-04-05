@@ -1,0 +1,209 @@
+﻿@model EATS365_Library.Paging.PaginatedList<EATS365_Library.DTO.ProductDTO>
+
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css" type="text/css">
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/js/bootstrap.js" type="text/javascript">
+    <link rel="stylesheet" href="~/css/base.css" type="text/css">
+    <title>Manage-order</title>
+</head>
+
+
+<div class="container-fluid wrapper">
+    <div class="container-fluid table-container">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-12">
+                    <h6 class="table-header">MANAGE PRODUCT</h6>
+                    <form asp-action="Index" method="get">
+                        <div class="table-control-btn-group">
+                            <div class="form-actions no-color">
+                                Category:
+                                <select name="SearchCategory" asp-items="@ViewBag.CatId">
+                                    @foreach (SelectListItem item in ViewBag.CatId)
+                                    {
+                                        if (item.Value == ViewBag.SelectedCategory)
+                                        {
+                                            <option value="@item.Value" selected>@item.Text</option>
+                                        }
+                                        else
+                                        {
+                                            <option value="@item.Value">@item.Text</option>
+                                        }
+                                    }
+
+                                </select>
+                            </div>
+                            <div class="table-control-btn-group">
+                                <div class="search-group">
+                                    <input type="text" name="searchName" value="@ViewBag.SearchName" placeholder="Cơm sườn bì chả" />
+                                    <button type="submit" class="btn-main btn-search">
+                                        <i class="fa-solid fa-magnifying-glass"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="table-control-btn-group">
+                            <div class="form-actions no-color" style="margin-top: 10px">
+                                Title:
+                                <input type="radio" id="name" name="searchTitle" value="name" @(ViewBag.SearchTitle == "name" ? "checked" : "")>
+                                <label for="name">Name</label>
+                                <input type="radio" id="price" name="searchTitle" value="price" @(ViewBag.SearchTitle == "price" ? "checked" : "")>
+                                <label for="price">Price</label>
+                            </div>
+                            <div class="form-actions no-color" style="margin-top: 10px">
+                                Oder:
+                                <input type="radio" id="ascending" name="searchOrder" value="asc" @(ViewBag.SearchOrder == "asc" ? "checked" : "")>
+                                <label for="ascending">Ascending</label>
+                                <input type="radio" id="descending" name="searchOrder" value="desc" @(ViewBag.SearchOrder == "desc" ? "checked" : "")>
+                                <label for="descending">Descending</label>
+                            </div>
+                            <button class="btn-primary btn-add">
+                                <a asp-action="Create">Back to full list</a>
+                            </button>
+                            <button class="btn-primary btn-add">
+                                <i class="fa-solid fa-plus"></i>
+                                <a asp-action="Create">Create New</a>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-12">
+                    <table class="table table-striped text-center align-middle">
+                        <thead class="table-heading">
+                            <tr>
+                                <th class="table-heading-text">
+                                    ID
+                                </th>
+                                <th class="table-heading-text">
+                                    Image
+                                </th>
+                                <th class="table-heading-text">
+                                    Name
+                                </th>
+                                <th class="table-heading-text">
+                                    Description
+                                </th>
+                                <th class="table-heading-text">
+                                    Price
+                                </th>
+                                <th class="table-heading-text">
+                                    Discount
+                                </th>
+                                <th class="table-heading-text">
+                                    Status
+                                </th>
+                                <th>Options</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td class="table-order">
+                                        @Html.DisplayFor(modelItem => item.ProductId)
+                                    </td>
+                                    <td class="table-img">
+                                        <img src="@item.ProductImage" alt="" style="width : 100px; height : 100px;">
+                                    </td>
+                                    <td class="table-name">
+                                        @Html.DisplayFor(modelItem => item.ProductName )
+
+                                    </td>
+                                    <td class="table-description">
+                                        <span>
+                                            @Html.DisplayFor(modelItem => item.ProductDescription)
+                                        </span>
+                                    </td>
+                                    <td class="table-price">
+                                        @Html.DisplayFor(modelItem => item.ProductPrice)
+                                    </td>
+                                    <td class="table-sale">
+                                        @Html.DisplayFor(modelItem => item.ProductSalePercent)
+                                    </td>
+                                    <td class="table-status">
+                                        @Html.DisplayFor(modelItem => item.ProductStatus)
+                                    </td>
+
+                                    <td class="table-btn">
+                                        @Html.ActionLink("Edit", "Edit", new { id = item.ProductId }) |
+                                        @Html.ActionLink("Delete", "Delete", new { id = item.ProductId })
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+
+@{
+    var prevDisabled = !Model.HasPreviousPage ? "disabled" : "";
+    var nextDisabled = !Model.HasNextPage ? "disabled" : "";
+}
+
+
+<div class="container-fluid pagination-container">
+    <div class="row">
+        <div class="col-sm-12">
+        </div>
+    </div>
+</div>
+<nav aria-label="Page navigation example">
+    <ul class="pagination justify-content-center">
+        <li class="page-item">
+            <a class="page-link"asp-action="Index"
+               asp-route-searchName="@ViewBag.SearchName"
+               asp-route-searchCategory="@ViewBag.SelectedCategory"
+               asp-route-searchTitle="@ViewBag.SearchTitle"
+               asp-route-searchOrder="@ViewBag.SearchOrder"
+               asp-route-pageNumber="@(Model.PageIndex - 1)"
+               class="btn btn-default @prevDisabled">
+                <span aria-hidden="true">&laquo;</span>
+            </a>
+        </li>
+        @for (int i = 1; i <= ViewBag.TotalPage; i++)
+        {
+            <a class="page-link" asp-action="Index"
+           asp-route-searchName="@ViewBag.SearchName"
+           asp-route-searchCategory="@ViewBag.SelectedCategory"
+           asp-route-searchTitle="@ViewBag.SearchTitle"
+           asp-route-searchOrder="@ViewBag.SearchOrder"
+           asp-route-pageNumber="@i">
+                @i
+            </a>
+        }
+        <li class="page-item">
+            <a class="page-link" sp-action="Index"
+               asp-route-searchName="@ViewBag.SearchName"
+               asp-route-searchCategory="@ViewBag.SelectedCategory"
+               asp-route-searchTitle="@ViewBag.SearchTitle"
+               asp-route-searchOrder="@ViewBag.SearchOrder"
+               asp-route-pageNumber="@(Model.PageIndex + 1)"
+               class="btn btn-default @nextDisabled">
+                <span aria-hidden="true">&raquo;</span>
+            </a>
+        </li>
+    </ul>
+</nav>
+
+<style>
+    .page-link {
+        display: inline-block;
+    }
+</style>

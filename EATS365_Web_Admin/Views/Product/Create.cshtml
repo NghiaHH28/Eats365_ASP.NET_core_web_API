@@ -1,0 +1,91 @@
+﻿@model EATS365_Library.DTO.ProductDTO
+
+@{
+    ViewData["Title"] = "Create";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid wrapper">
+    <div class="container-fluid container-fluid-form">
+        <div class="wrapper-form">
+            <form asp-action="Create">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <div class="form-heading-group">
+                    <i class="fa-solid fa-file-pen"></i>
+                    <h2 class="form-heading">ADD PRODUCT</h2>
+                </div>
+                <div class="form-control-group">
+                    <label asp-for="ProductName" class="form-text-label"></label>
+                    <input asp-for="ProductName" />
+                    <span asp-validation-for="ProductName" class="text-danger"></span>
+                </div>
+                <div class="form-control-group">
+                    <label asp-for="ProductDescription" class="form-text-label"></label>
+                    <input asp-for="ProductDescription"/>
+                    <span asp-validation-for="ProductDescription" class="text-danger"></span>
+                </div>
+                <div class="form-control-group">
+                    <label asp-for="ProductPrice" class="form-text-label"></label>
+                    <input asp-for="ProductPrice" />
+                    <span asp-validation-for="ProductPrice" class="text-danger"></span>
+                </div>
+                <div class="form-control-group">
+                    <label asp-for="ProductSalePercent" class="form-text-label"></label>
+                    <input asp-for="ProductSalePercent" />
+                    <span asp-validation-for="ProductSalePercent" class="text-danger"></span>
+                </div>
+                <div class="form-control-group">
+                    <label asp-for="ProductStatus" class="form-text-label"></label>
+                    <input asp-for="ProductStatus" />
+                    <span asp-validation-for="ProductStatus" class="text-danger"></span>
+                </div>
+                <div class="form-control-group">
+                    <label asp-for="ProductImage" class="form-text-label"></label>
+                    <input type="file" id="product-image" accept=".png,.jpg,.jpeg" onchange="previewImage()" />
+                    <input type="hidden" asp-for="ProductImage" name="ProductImage" />
+                    <img id="preview-image" src="#" alt="Preview Image" style="width : 50px; Height : 50px; display: none" />
+                    <span asp-validation-for="ProductImage" class="text-danger"></span>
+                </div>
+                <div class="form-control-group">
+                    <label asp-for="CategoryId" class="form-text-label"></label>
+                    <select asp-for="CategoryId">
+                        <option value="FOOD">FOOD</option>
+                        <option value="DRINK">DRINK</option>
+                        <option value="SOUP">SOUP</option>
+                        <option value="COMBO">COMBO</option>
+                    </select>
+                    <span asp-validation-for="CategoryId" class="text-danger"></span>
+                </div>
+                <div class="form-btn-group">
+                    <input type="submit" value="Create" class="btn btn-primary" />
+                    <h6 class="form-btn-separator">&nbsp;OR&nbsp;</h6>
+                    <button type="button" class="btn btn-primary">
+                        <a asp-action="Index">Back to List</a>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<script>
+    function previewImage() {
+        const input = document.getElementById('product-image');
+        const file = input.files[0];
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onloadend = function () {
+            const base64String = reader.result.replace('data:', '').replace(/^.+,/, '');
+            document.getElementById('ProductImage').value = 'data:image/png;base64,' + base64String;
+
+            var previewImage = document.getElementById('preview-image');
+            previewImage.src = reader.result;
+            previewImage.style.display = 'block';
+        }
+    }
+</script>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
