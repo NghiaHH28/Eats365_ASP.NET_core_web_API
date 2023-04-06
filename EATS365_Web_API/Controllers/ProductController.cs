@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Linq;
 using System;
 using EATS365_Library.DTO;
+using Microsoft.AspNetCore.Authorization;
 
 namespace EATS365_Web_API.Controllers
 {
@@ -17,7 +18,8 @@ namespace EATS365_Web_API.Controllers
         public ProductController() => _productRepository = new ProductRepository();
 
         [HttpGet]
-        public IActionResult GetProducts(string searchTitle, string searchOrder, string searchName, string searchCategory, int? pageNumber = 1)
+        [Authorize(Roles = "admin")]
+        public IActionResult Get(string searchTitle, string searchOrder, string searchName, string searchCategory, int? pageNumber = 1)
         {
             try
             {
@@ -75,11 +77,163 @@ namespace EATS365_Web_API.Controllers
                     PageIndex = listProducts.PageIndex
                 });
             }
-            catch
+            catch (Exception ex) 
             {
-                return Ok(new PagingReponse { 
-                    Success = false, 
-                    Message = "Không có sản phẩm nào được tìm thấy!"
+                return Ok(new PagingReponse
+                {
+                    Success = false,
+                    Message = ex.Message
+                });
+            }
+        }
+
+        [HttpGet("{id}")]
+        [Authorize(Roles = "admin")]
+        public IActionResult Get(string id)
+        {
+            if (string.IsNullOrEmpty(id))
+            {
+                return Ok(new APIResponseDTO
+                {
+                    Success = false,
+                    Message = "ID is null!"
+                });
+            }
+
+            try
+            {
+                var product = _productRepository.GetProductByProductID(id);
+
+                return Ok(new APIResponseDTO
+                {
+                    Success = true,
+                    Data = product
+                });
+            }
+            catch (Exception ex)
+            {
+                return Ok(new APIResponseDTO
+                {
+                    Success = false,
+                    Message = ex.Message
+                });
+            }
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "admin")]
+        public IActionResult Post([FromBody] ProductDTO product)
+        {
+            if (product == null)
+            {
+                return Ok(new APIResponseDTO
+                {
+                    Success = false,
+                    Message = "Product is null!"
+                });
+            }
+
+            try
+            {
+                product.ProductId = _productRepository.GetNewProductID(product.ProductName);
+                _productRepository.AddProduct(product);
+
+                return Ok(new APIResponseDTO
+                {
+                    Success = true,
+                    Message = "Add successful!"
+                });
+            }
+            catch (Exception ex)
+            {
+                return Ok(new APIResponseDTO
+                {
+                    Success = false,
+                    Message = ex.Message
+                });
+            }
+        }
+
+        [HttpPut("{id}")]
+        [Authorize(Roles = "admin")]
+        public IActionResult Put(string id, [FromBody] ProductDTO product)
+        {
+            if (product == null)
+            {
+                return Ok(new APIResponseDTO
+                {
+                    Success = false,
+                    Message = "Product is null!"
+                });
+            }
+
+            if (string.IsNullOrEmpty(id))
+            {
+                return Ok(new APIResponseDTO
+                {
+                    Success = false,
+                    Message = "ID is null!"
+                });
+            }
+
+            if (!id.Equals(product.ProductId))
+            {
+                return Ok(new APIResponseDTO
+                {
+                    Success = false,
+                    Message = "ID and ID of product is not equal!"
+                });
+            }
+
+            try
+            {
+                _productRepository.UpdateProduct(product);
+
+                return Ok(new APIResponseDTO
+                {
+                    Success = true,
+                    Message = "Update successful!"
+                });
+            }
+            catch (Exception ex)
+            {
+                return Ok(new APIResponseDTO
+                {
+                    Success = false,
+                    Message = ex.Message
+                });
+            }
+        }
+
+        [HttpDelete("{id}")]
+        [Authorize(Roles = "admin")]
+        public IActionResult Delete(string id)
+        {
+            if (string.IsNullOrEmpty(id))
+            {
+                return Ok(new APIResponseDTO
+                {
+                    Success = false,
+                    Message = "ID is null!"
+                });
+            }
+
+            try
+            {
+                _productRepository.DeleteProduct(id);
+
+                return Ok(new APIResponseDTO
+                {
+                    Success = true,
+                    Message = "Delete successful!"
+                });
+            }
+            catch (Exception ex)
+            {
+                return Ok(new APIResponseDTO
+                {
+                    Success = false,
+                    Message = ex.Message
                 });
             }
         }

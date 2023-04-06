@@ -19,12 +19,26 @@ namespace EATS365_Web_API.Controllers
             try
             {
                 var accountDTO = _accountRepository.Login(loginDTO.AccountEmail, loginDTO.AccountPassword);
+
+                if (accountDTO == null)
+                {
+                    return Ok(new APIResponseDTO
+                    {
+                        Success = false,
+                        Message = "Email hoặc password không đúng! Vui lòng đăng nhập lại!"
+                    });
+                }
+
+                // Create token
+
+
                 return Ok(new APIResponseDTO
                 {
                     Success = true,
                     Message = "Đăng nhập thành công!",
-                    Data = accountDTO
+                    Data = _accountRepository.GenerageToken(accountDTO)
                 });
+
             } catch
             {
                 return Ok(new APIResponseDTO
