@@ -212,6 +212,9 @@ namespace EATS365_Web_Admin.Controllers
 
             if (jwtToken == null) return RedirectToAction("Index", "Login");
 
+            // Add JWT
+            _client.DefaultRequestHeaders.Add("Authorization", "Bearer " + jwtToken);
+
             HttpResponseMessage response = await _client.PutAsJsonAsync(_productApiUrl + "/" + id, product);
 
             string stringData = await response.Content.ReadAsStringAsync();
@@ -276,6 +279,9 @@ namespace EATS365_Web_Admin.Controllers
             var jwtToken = HttpContext.Session.GetString("Token");
 
             if (jwtToken == null) return RedirectToAction("Index", "Login");
+
+            // Add JWT
+            _client.DefaultRequestHeaders.Add("Authorization", "Bearer " + jwtToken);
 
             HttpResponseMessage response = await _client.DeleteAsync(_productApiUrl + "/" + id);
             string stringData = await response.Content.ReadAsStringAsync();
