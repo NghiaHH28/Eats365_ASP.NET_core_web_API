@@ -10,5 +10,7 @@ namespace DataAccess.Repository
     public interface IAccountRepository
     {
         public AccountDTO Login(string email, string password);
+
+        public string GenerageToken(AccountDTO accountDTO);
     }
 }

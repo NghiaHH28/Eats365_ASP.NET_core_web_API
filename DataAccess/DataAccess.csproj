@@ -17,7 +17,6 @@
 
   <ItemGroup>
     <Folder Include="DAO\" />
-    <Folder Include="Hash\" />
   </ItemGroup>
 
 </Project>

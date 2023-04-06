@@ -84,8 +84,29 @@
     }
 </script>
 
+@if (!string.IsNullOrEmpty(TempData["ErrorMessage"] as string))
+{
+    <div id="dialog" title="Thông báo lỗi">
+        @TempData["ErrorMessage"]
+    </div>
+}
+
 @section Scripts {
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
+
+    <script>
+        var errorMessage = '@TempData["ErrorMessage"]';
+        if (errorMessage != '') {
+            $("#dialog").dialog({
+                modal: true,
+                buttons: {
+                    OK: function () {
+                        $(this).dialog("close");
+                    }
+                }
+            });
+        }
+    </script>
 }

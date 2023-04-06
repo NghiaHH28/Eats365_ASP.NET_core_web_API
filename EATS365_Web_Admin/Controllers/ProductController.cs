@@ -11,6 +11,7 @@ using EATS365_Library.DTO;
 using EATS365_Library.Paging;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Collections.Generic;
+using Microsoft.Extensions.Options;
 
 namespace EATS365_Web_Admin.Controllers
 {
@@ -37,6 +38,17 @@ namespace EATS365_Web_Admin.Controllers
         // GET: ProductController
         public async Task<ActionResult> Index(string searchTitle, string searchOrder, string searchName, string searchCategory, int? pageNumber = 1)
         {
+            // Get JWT
+            if (HttpContext.Session == null) return RedirectToAction("Index", "Login");
+
+            var jwtToken = HttpContext.Session.GetString("Token");
+
+            if (jwtToken == null) return RedirectToAction("Index", "Login");
+
+            // Add JWT
+            _client.DefaultRequestHeaders.Add("Authorization", "Bearer " + jwtToken);
+
+            // Call API product
             HttpResponseMessage response = await _client.GetAsync(_productApiUrl + "?searchTitle=" + searchTitle
                 + "&searchOrder=" + searchOrder + "&searchName=" + searchName + "&searchCategory=" + searchCategory + "&pageNumber=" + pageNumber);
             string stringData = await response.Content.ReadAsStringAsync();
@@ -77,13 +89,42 @@ namespace EATS365_Web_Admin.Controllers
                 return View(listProducts);
             }
 
+            TempData["ErrorMessage"] = apiResponse.Message;
             return View();
         }
 
         // GET: ProductController/Details/5
-        public ActionResult Details(int id)
+        public async Task<ActionResult> Details(string id)
         {
-            return View();
+            // Get JWT
+            if (HttpContext.Session == null) return RedirectToAction("Index", "Login");
+
+            var jwtToken = HttpContext.Session.GetString("Token");
+
+            if (jwtToken == null) return RedirectToAction("Index", "Login");
+
+            // Add JWT
+            _client.DefaultRequestHeaders.Add("Authorization", "Bearer " + jwtToken);
+
+            HttpResponseMessage response = await _client.GetAsync(_productApiUrl + "/" + id);
+            string stringData = await response.Content.ReadAsStringAsync();
+            var options = new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            };
+
+            APIResponseDTO apiResponse = JsonSerializer.Deserialize<APIResponseDTO>(stringData, options);
+
+            if(apiResponse.Success)
+            {
+                string json = apiResponse.Data.ToString();
+                ProductDTO products = Newtonsoft.Json.JsonConvert.DeserializeObject<ProductDTO>(json);
+
+                return View(products);
+            }
+
+            TempData["ErrorMessage"] = apiResponse.Message;
+            return RedirectToAction("Index", "Product");
         }
 
         // GET: ProductController/Create
@@ -95,58 +136,164 @@ namespace EATS365_Web_Admin.Controllers
         // POST: ProductController/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(IFormCollection collection)
+        public async Task<ActionResult> Create(ProductDTO product)
         {
-            try
+            // Get JWT
+            if (HttpContext.Session == null) return RedirectToAction("Index", "Login");
+
+            var jwtToken = HttpContext.Session.GetString("Token");
+
+            if (jwtToken == null) return RedirectToAction("Index", "Login");
+
+            // Add JWT
+            _client.DefaultRequestHeaders.Add("Authorization", "Bearer " + jwtToken);
+
+            HttpResponseMessage response = await _client.PostAsJsonAsync(_productApiUrl, product);
+            string stringData = await response.Content.ReadAsStringAsync();
+            var options = new JsonSerializerOptions
             {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
+                PropertyNameCaseInsensitive = true
+            };
+
+            APIResponseDTO apiResponse = JsonSerializer.Deserialize<APIResponseDTO>(stringData, options);
+
+            if (apiResponse.Success)
             {
-                return View();
+                return RedirectToAction("Index");
             }
+
+            TempData["ErrorMessage"] = apiResponse.Message;
+            return RedirectToAction("Create", "Product");
         }
 
         // GET: ProductController/Edit/5
-        public ActionResult Edit(int id)
+        public async Task<ActionResult> Edit(string id)
         {
-            return View();
+            // Get JWT
+            if (HttpContext.Session == null) return RedirectToAction("Index", "Login");
+
+            var jwtToken = HttpContext.Session.GetString("Token");
+
+            if (jwtToken == null) return RedirectToAction("Index", "Login");
+
+            // Add JWT
+            _client.DefaultRequestHeaders.Add("Authorization", "Bearer " + jwtToken);
+
+            HttpResponseMessage response = await _client.GetAsync(_productApiUrl + "/" + id);
+            string stringData = await response.Content.ReadAsStringAsync();
+            var options = new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            };
+
+            APIResponseDTO apiResponse = JsonSerializer.Deserialize<APIResponseDTO>(stringData, options);
+
+            if (apiResponse.Success)
+            {
+                string json = apiResponse.Data.ToString();
+                ProductDTO products = Newtonsoft.Json.JsonConvert.DeserializeObject<ProductDTO>(json);
+
+                return View(products);
+            }
+
+            TempData["ErrorMessage"] = apiResponse.Message;
+            return RedirectToAction("Index", "Product");
         }
 
         // POST: ProductController/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
+        public async Task<ActionResult> Edit(string id, ProductDTO product)
         {
-            try
+            // Get JWT
+            if (HttpContext.Session == null) return RedirectToAction("Index", "Login");
+
+            var jwtToken = HttpContext.Session.GetString("Token");
+
+            if (jwtToken == null) return RedirectToAction("Index", "Login");
+
+            HttpResponseMessage response = await _client.PutAsJsonAsync(_productApiUrl + "/" + id, product);
+
+            string stringData = await response.Content.ReadAsStringAsync();
+            var options = new JsonSerializerOptions
             {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
+                PropertyNameCaseInsensitive = true
+            };
+
+            APIResponseDTO apiResponse = JsonSerializer.Deserialize<APIResponseDTO>(stringData, options);
+
+            if (apiResponse.Success)
             {
-                return View();
+                return RedirectToAction("Index");
             }
+
+            TempData["ErrorMessage"] = apiResponse.Message;
+            return RedirectToAction("Index", "Product");
         }
 
         // GET: ProductController/Delete/5
-        public ActionResult Delete(int id)
+        public async Task<ActionResult> Delete(string id)
         {
-            return View();
+            // Get JWT
+            if (HttpContext.Session == null) return RedirectToAction("Index", "Login");
+
+            var jwtToken = HttpContext.Session.GetString("Token");
+
+            if (jwtToken == null) return RedirectToAction("Index", "Login");
+
+            // Add JWT
+            _client.DefaultRequestHeaders.Add("Authorization", "Bearer " + jwtToken);
+
+            HttpResponseMessage response = await _client.GetAsync(_productApiUrl + "/" + id);
+            string stringData = await response.Content.ReadAsStringAsync();
+            var options = new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            };
+
+            APIResponseDTO apiResponse = JsonSerializer.Deserialize<APIResponseDTO>(stringData, options);
+
+            if (apiResponse.Success)
+            {
+                string json = apiResponse.Data.ToString();
+                ProductDTO products = Newtonsoft.Json.JsonConvert.DeserializeObject<ProductDTO>(json);
+
+                return View(products);
+            }
+
+            TempData["ErrorMessage"] = apiResponse.Message;
+            return RedirectToAction("Index", "Product");
         }
 
         // POST: ProductController/Delete/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
+        public async Task<ActionResult> Delete(string id, IFormCollection collection)
         {
-            try
+            // Get JWT
+            if (HttpContext.Session == null) return RedirectToAction("Index", "Login");
+
+            var jwtToken = HttpContext.Session.GetString("Token");
+
+            if (jwtToken == null) return RedirectToAction("Index", "Login");
+
+            HttpResponseMessage response = await _client.DeleteAsync(_productApiUrl + "/" + id);
+            string stringData = await response.Content.ReadAsStringAsync();
+            var options = new JsonSerializerOptions
             {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
+                PropertyNameCaseInsensitive = true
+            };
+
+            APIResponseDTO apiResponse = JsonSerializer.Deserialize<APIResponseDTO>(stringData, options);
+
+            if (apiResponse.Success)
             {
-                return View();
+                return RedirectToAction("Index");
             }
+
+            TempData["ErrorMessage"] = apiResponse.Message;
+            return RedirectToAction("Index", "Product");
+            
         }
     }
 }

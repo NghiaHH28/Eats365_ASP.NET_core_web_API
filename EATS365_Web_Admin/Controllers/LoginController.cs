@@ -9,6 +9,9 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using System;
+using Newtonsoft.Json.Linq;
+using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
 
 namespace EATS365_Web_Admin.Controllers
 {
@@ -65,13 +68,41 @@ namespace EATS365_Web_Admin.Controllers
 
             if (apiResponse.Success)
             {
-                string json = apiResponse.Data.ToString();
-                AccountDTO account = Newtonsoft.Json.JsonConvert.DeserializeObject<AccountDTO>(json);
+                string jwtToken = apiResponse.Data.ToString();
+
+                // Create a token handler
+                var tokenHandler = new JwtSecurityTokenHandler();
+
+                // Read the token
+                var token = tokenHandler.ReadJwtToken(jwtToken);
+
+                // Get the claims
+                var claims = token.Claims;
+
+                // Get the value of the 'unique_name' claim
+                var accountName = claims.FirstOrDefault(c => c.Type == "unique_name")?.Value;
+
+                // Get the value of the 'email' claim
+                var accountEmail = claims.FirstOrDefault(c => c.Type == "email")?.Value;
+
+                // Get the value of the 'ID' claim
+                var accountID = claims.FirstOrDefault(c => c.Type == "ID")?.Value;
+
+                // Get the value of the 'TokenID' claim
+                var tokenId = claims.FirstOrDefault(c => c.Type == "TokenID")?.Value;
+
+                AccountDTO account = new AccountDTO
+                {
+                    AccountId = accountID,
+                    AccountEmail = accountEmail,
+                    AccountName = accountName
+                };
 
                 if (account != null && account.AccountId.Equals("AD0001"))
                 {
                     HttpContext.Session.SetString("AccountID", account.AccountId);
                     HttpContext.Session.SetString("AccountName", account.AccountName);
+                    HttpContext.Session.SetString("Token", jwtToken);
                     return RedirectToAction("Index", "Home");
                 }
                 else
