@@ -1,5 +1,6 @@
 ﻿using DataAccess.Context;
 using EATS365_Library.DTO;
+using EATS365_Library.EATS365_Exception;
 using EATS365_Library.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -9,6 +10,7 @@ using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.IO;
 using System.Linq;
+using System.Security.Authentication;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
@@ -38,44 +40,57 @@ namespace DataAccess.DAO
 
         public AccountDAO() => _context = new EATS365Context();
 
-        public AccountDTO Login(string email, string password)
+        public async Task<AccountDTO> LoginAsync(string email, string password)
         {
-            if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password)) return null;
+            if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password))
+            {
+                throw new ArgumentNullException("Email or Password can not be empty!");
+            }
 
             Account account = null;
             try
             {
-                account = _context.Accounts.Where(a => a.AccountEmail.ToLower().Equals(email.ToLower()) && a.AccountPassword.Equals(password) 
-                && a.AccountStatus.Equals("ACTIVED")).FirstOrDefault();
+                account = await _context.Accounts.SingleOrDefaultAsync(a => a.AccountEmail.ToLower() == email.ToLower());
             }
             catch (Exception ex)
             {
-                throw new Exception(ex.Message);
+                throw new Exception("An error occurred while querying the database!", ex);
+            }
+
+            if (account == null)
+            {
+                throw new AccountNotFoundException();
+            }
+
+            if (!account.AccountPassword.Equals(password))
+            {
+                throw new InvalidCredentialsException();
+            }
+
+            if (account.AccountStatus != "ACTIVATED")
+            {
+                throw new AccountNotActivatedException();
             }
 
             _context.Entry(account).State = EntityState.Detached;
 
-            if (account != null)
+            AccountDTO accountDTO = new AccountDTO
             {
-                AccountDTO accountDTO = new AccountDTO
-                {
-                    AccountId = account.AccountId,
-                    AccountEmail = account.AccountEmail,
-                    AccountName = account.AccountName,
-                    AccountPhone = account.AccountPhone,
-                    AccountAddress = account.AccountAddress,
-                    AccountBirthDay = account.AccountBirthDay,
-                    AccountStartDate = account.AccountStartDate,
-                    AccountStatus = account.AccountStatus
-                };
+                AccountId = account.AccountId,
+                AccountEmail = account.AccountEmail,
+                AccountName = account.AccountName,
+                AccountPhone = account.AccountPhone,
+                AccountAddress = account.AccountAddress,
+                AccountBirthDay = account.AccountBirthDay,
+                AccountStartDate = account.AccountStartDate,
+                AccountStatus = account.AccountStatus
+            };
 
-                return accountDTO;
-            }
-
-            return null;
+            return accountDTO;
         }
 
-        public string GenerageToken(AccountDTO accountDTO)
+
+        public string GenerateToken(AccountDTO accountDTO)
         {
             if (accountDTO == null) return null;
 

@@ -9,8 +9,8 @@ namespace DataAccess.Repository
 {
     public interface IAccountRepository
     {
-        public AccountDTO Login(string email, string password);
+        public Task<AccountDTO> LoginAsync(string email, string password);
 
-        public string GenerageToken(AccountDTO accountDTO);
+        public string GenerateToken(AccountDTO accountDTO);
     }
 }

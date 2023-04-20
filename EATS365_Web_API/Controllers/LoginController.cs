@@ -2,6 +2,10 @@
 using EATS365_Library.DTO;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Authentication;
+using System.Threading.Tasks;
+using System;
+using EATS365_Library.EATS365_Exception;
 
 namespace EATS365_Web_API.Controllers
 {
@@ -9,44 +13,71 @@ namespace EATS365_Web_API.Controllers
     [ApiController]
     public class LoginController : ControllerBase
     {
-        IAccountRepository _accountRepository;
+        private readonly IAccountRepository _accountRepository;
 
         public LoginController() => _accountRepository = new AccountRepository();
 
         [HttpPost]
-        public IActionResult Login([FromBody] LoginDTO loginDTO)
+        public async Task<ActionResult<APIResponseDTO>> Login(LoginDTO loginDTO)
         {
             try
             {
-                var accountDTO = _accountRepository.Login(loginDTO.AccountEmail, loginDTO.AccountPassword);
+                var accountDTO = await _accountRepository.LoginAsync(loginDTO.AccountEmail, loginDTO.AccountPassword);
 
-                if (accountDTO == null)
-                {
-                    return Ok(new APIResponseDTO
-                    {
-                        Success = false,
-                        Message = "Email hoặc password không đúng! Vui lòng đăng nhập lại!"
-                    });
-                }
-
-                // Create token
-
+                var token = _accountRepository.GenerateToken(accountDTO);
 
                 return Ok(new APIResponseDTO
                 {
                     Success = true,
-                    Message = "Đăng nhập thành công!",
-                    Data = _accountRepository.GenerageToken(accountDTO)
+                    UserMessage = "Login successful!",
+                    StatusCode = 200,
+                    Data = token
                 });
-
-            } catch
+            } catch (AccountNotActivatedException ex)
             {
-                return Ok(new APIResponseDTO
+                return NotFound(new APIResponseDTO
                 {
                     Success = false,
-                    Message = "Email hoặc password không đúng! Vui lòng đăng nhập lại!"
+                    UserMessage = ex.Message,
+                    InternalMessage = ex.ToString(),
+                    StatusCode = 404,
+                    Data = null
+                });
+            }
+            catch (AccountNotFoundException ex)
+            {
+                return NotFound(new APIResponseDTO
+                {
+                    Success = false,
+                    UserMessage = ex.Message,
+                    InternalMessage = ex.ToString(),
+                    StatusCode = 404,
+                    Data = null
+                });
+            }
+            catch (InvalidCredentialsException ex)
+            {
+                return BadRequest(new APIResponseDTO
+                {
+                    Success = false,
+                    UserMessage = ex.Message,
+                    InternalMessage = ex.ToString(),
+                    StatusCode = 400,
+                    Data = null
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new APIResponseDTO
+                {
+                    Success = false,
+                    UserMessage = "An error occurred during processing. Please try again later!",
+                    InternalMessage = ex.ToString(),
+                    StatusCode = 500,
+                    Data = null
                 });
             }
         }
     }
+
 }
