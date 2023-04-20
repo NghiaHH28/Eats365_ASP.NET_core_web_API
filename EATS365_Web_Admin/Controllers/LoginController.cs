@@ -112,7 +112,7 @@ namespace EATS365_Web_Admin.Controllers
                 }
             }
 
-            TempData["ErrorMessage"] = apiResponse.Message;
+            TempData["ErrorMessage"] = apiResponse.UserMessage;
             return RedirectToAction("Index", "Login");
         }
 

@@ -123,7 +123,7 @@ namespace EATS365_Web_Admin.Controllers
                 return View(products);
             }
 
-            TempData["ErrorMessage"] = apiResponse.Message;
+            TempData["ErrorMessage"] = apiResponse.UserMessage;
             return RedirectToAction("Index", "Product");
         }
 
@@ -162,7 +162,7 @@ namespace EATS365_Web_Admin.Controllers
                 return RedirectToAction("Index");
             }
 
-            TempData["ErrorMessage"] = apiResponse.Message;
+            TempData["ErrorMessage"] = apiResponse.UserMessage;
             return RedirectToAction("Create", "Product");
         }
 
@@ -196,7 +196,7 @@ namespace EATS365_Web_Admin.Controllers
                 return View(products);
             }
 
-            TempData["ErrorMessage"] = apiResponse.Message;
+            TempData["ErrorMessage"] = apiResponse.UserMessage;
             return RedirectToAction("Index", "Product");
         }
 
@@ -230,7 +230,7 @@ namespace EATS365_Web_Admin.Controllers
                 return RedirectToAction("Index");
             }
 
-            TempData["ErrorMessage"] = apiResponse.Message;
+            TempData["ErrorMessage"] = apiResponse.UserMessage;
             return RedirectToAction("Index", "Product");
         }
 
@@ -264,7 +264,7 @@ namespace EATS365_Web_Admin.Controllers
                 return View(products);
             }
 
-            TempData["ErrorMessage"] = apiResponse.Message;
+            TempData["ErrorMessage"] = apiResponse.UserMessage;
             return RedirectToAction("Index", "Product");
         }
 
@@ -297,7 +297,7 @@ namespace EATS365_Web_Admin.Controllers
                 return RedirectToAction("Index");
             }
 
-            TempData["ErrorMessage"] = apiResponse.Message;
+            TempData["ErrorMessage"] = apiResponse.UserMessage;
             return RedirectToAction("Index", "Product");
             
         }
