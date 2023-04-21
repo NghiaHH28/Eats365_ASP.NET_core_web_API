@@ -20,6 +20,17 @@ namespace EATS365_Web_API.Controllers
         [HttpPost]
         public async Task<ActionResult<APIResponseDTO>> Login(LoginDTO loginDTO)
         {
+            if (string.IsNullOrEmpty(loginDTO.AccountEmail) || string.IsNullOrEmpty(loginDTO.AccountPassword))
+            {
+                return BadRequest(new APIResponseDTO
+                {
+                    Success = false,
+                    UserMessage = "Email or Password can not be empty!",
+                    StatusCode = 400,
+                    Data = null
+                });
+            }
+
             try
             {
                 var accountDTO = await _accountRepository.LoginAsync(loginDTO.AccountEmail, loginDTO.AccountPassword);

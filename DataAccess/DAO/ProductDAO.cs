@@ -1,6 +1,7 @@
 ﻿using DataAccess.Context;
 using DataAccess.Hash;
 using EATS365_Library.DTO;
+using EATS365_Library.EATS365_Exception;
 using EATS365_Library.Entities;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
@@ -40,44 +41,58 @@ namespace DataAccess.DAO
         public IEnumerable<ProductDTO> GetProducts()
         {
             var products = new List<Product>();
+            string productStatus = "REMOVED";
 
             try
             {
-                products = _context.Products.ToList();
-
-                var productDTOs = products.Select(p => new ProductDTO
-                {
-                    ProductId = p.ProductId,
-                    ProductName = p.ProductName,
-                    ProductDescription = p.ProductDescription,
-                    ProductStatus = p.ProductStatus,
-                    ProductImage = p.ProductImage,
-                    ProductPrice = p.ProductPrice,
-                    ProductSalePercent = p.ProductSalePercent,
-                    CategoryId = p.CategoryId
-                });
-
-                return productDTOs;
+                products = _context.Products.Where(p => !p.ProductStatus.Equals(productStatus)).ToList();
             }
             catch (Exception ex)
             {
-                throw new Exception("Not found!");
+                throw new Exception("An error occurred while querying the database!", ex);
             }
+
+            if (products == null)
+            {
+                throw new ProductNotFoundException();
+            }
+
+            var productDTOs = products.Select(p => new ProductDTO
+            {
+                ProductId = p.ProductId,
+                ProductName = p.ProductName,
+                ProductDescription = p.ProductDescription,
+                ProductStatus = p.ProductStatus,
+                ProductImage = p.ProductImage,
+                ProductPrice = p.ProductPrice,
+                ProductSalePercent = p.ProductSalePercent,
+                CategoryId = p.CategoryId
+            });
+
+            return productDTOs;
         }
 
         public ProductDTO GetProductDTOByProductID(string productId)
         {
-            if (productId == null) return null;
+            if (string.IsNullOrEmpty(productId))
+            {
+                throw new ArgumentNullException("ID of product can not be empty!");
+            }
 
-            string productStatus = "REMOVED";
             Product product = null;
+
             try
             {
-                product = _context.Products.Include(p => p.Reviews).FirstOrDefault(p => !p.ProductStatus.Equals(productStatus) && p.ProductId == productId);
+                product = _context.Products.Include(p => p.Reviews).FirstOrDefault(p => p.ProductId == productId);
             }
             catch (Exception ex)
             {
-                throw new Exception("Not found!");
+                throw new Exception("An error occurred while querying the database!", ex);
+            }
+
+            if (product == null)
+            {
+                throw new ProductNotFoundException();
             }
 
             List<ReviewDTO> reviews = product.Reviews.Select(r => new ReviewDTO
@@ -111,16 +126,20 @@ namespace DataAccess.DAO
 
         public Product GetProductByProductID(string productId)
         {
-            if (productId == null) return null;
+            if (string.IsNullOrEmpty(productId))
+            {
+                throw new ArgumentNullException("ID of product can not be empty!");
+            }
 
             Product product = null;
+
             try
             {
                 product = _context.Products.FirstOrDefault(p => p.ProductId == productId);
             }
             catch (Exception ex)
             {
-                throw new Exception("Not found!");
+                throw new Exception("An error occurred while querying the database!", ex);
             }
 
             return product;
@@ -128,82 +147,88 @@ namespace DataAccess.DAO
 
         public void AddProduct(ProductDTO productDTO)
         {
-            if (productDTO == null) return;
+            if (productDTO == null)
+            {
+                throw new ArgumentNullException("Product can not be empty!");
+            }
 
             try
             {
                 Product _product = GetProductByProductID(productDTO.ProductId);
-                if (_product == null)
-                {
-                    Product product = new Product
-                    {
-                        ProductName = productDTO.ProductName,
-                        ProductDescription = productDTO.ProductDescription,
-                        ProductStatus = productDTO.ProductStatus,
-                        ProductImage = productDTO.ProductImage,
-                        ProductPrice = productDTO.ProductPrice,
-                        ProductId = productDTO.ProductId,
-                        ProductSalePercent = productDTO.ProductSalePercent,
-                        CategoryId = productDTO.CategoryId
-                    };
 
-                    _context.Products.Add(product);
-                    _context.SaveChanges();
-                }
-                else
+                if (_product != null)
                 {
-                    throw new Exception("The productID is already exist!");
+                    throw new ProductAlreadyExistException();
                 }
+
+                Product product = new Product
+                {
+                    ProductName = productDTO.ProductName,
+                    ProductDescription = productDTO.ProductDescription,
+                    ProductStatus = productDTO.ProductStatus,
+                    ProductImage = productDTO.ProductImage,
+                    ProductPrice = productDTO.ProductPrice,
+                    ProductId = productDTO.ProductId,
+                    ProductSalePercent = productDTO.ProductSalePercent,
+                    CategoryId = productDTO.CategoryId
+                };
+
+                _context.Products.Add(product);
+                _context.SaveChanges();
             }
             catch (Exception ex)
             {
-                throw new Exception(ex.Message);
+                throw new Exception("An error occurred while querying the database!", ex);
             }
         }
 
         public void UpdateProduct(ProductDTO productDTO)
         {
-            if (productDTO == null) return;
+            if (productDTO == null)
+            {
+                throw new ArgumentNullException("Product can not be empty!");
+            }
+
+            Product _product = GetProductByProductID(productDTO.ProductId);
+
+            if (_product == null)
+            {
+                throw new ProductNotFoundException();
+            }
 
             try
             {
-                Product _product = GetProductByProductID(productDTO.ProductId);
-                if (_product != null)
-                {
-                    _context.Entry(_product).CurrentValues.SetValues(productDTO);
-                    _context.SaveChanges();
-                }
-                else
-                {
-                    throw new Exception("The productID is not already exist!");
-                }
+                _context.Entry(_product).CurrentValues.SetValues(productDTO);
+                _context.SaveChanges();
             }
             catch (Exception ex)
             {
-                throw new Exception(ex.Message);
+                throw new Exception("An error occurred while querying the database!", ex);
             }
         }
 
         public void DeleteProduct(string productID)
         {
-            if (productID == null) return;
+            if (string.IsNullOrEmpty(productID))
+            {
+                throw new ArgumentNullException("ID of product can not be empty!");
+            }
+
+            Product _product = GetProductByProductID(productID);
+
+            if (_product == null)
+            {
+                throw new ProductNotFoundException();
+            }
 
             try
             {
-                Product _product = GetProductByProductID(productID);
-                if (_product != null)
-                {
-                    _product.ProductStatus = "REMOVED";
-                    _context.SaveChanges();
-                }
-                else
-                {
-                    throw new Exception("The productID is not already exist!");
-                }
+                _product.ProductStatus = "REMOVED";
+                _context.SaveChanges();
             }
             catch (Exception ex)
             {
-                throw new Exception(ex.Message);
+                throw new Exception("An error occurred while querying the database!", ex);
             }
 
         }
@@ -216,20 +241,29 @@ namespace DataAccess.DAO
             var strConn = config["ConnectionString:Eats365DB"];
             return strConn;
         }
+
         public string GetLastProductID()
         {
-            var connectionString = GetConnectionString();
-            var sqlQuery = @"SELECT TOP 1 ProductID
+            try
+            {
+                var connectionString = GetConnectionString();
+                var sqlQuery = @"SELECT TOP 1 ProductID
                      FROM Product
                      ORDER BY CAST(RIGHT(ProductId, 4) AS INT) DESC";
 
-            using (var connection = new SqlConnection(connectionString))
-            using (var command = new SqlCommand(sqlQuery, connection))
-            {
-                connection.Open();
-                var result = command.ExecuteScalar();
-                return result?.ToString();
+                using (var connection = new SqlConnection(connectionString))
+                using (var command = new SqlCommand(sqlQuery, connection))
+                {
+                    connection.Open();
+                    var result = command.ExecuteScalar();
+                    return result?.ToString();
+                }
             }
+            catch (Exception ex)
+            {
+                throw new Exception("An error occurred while querying the database!", ex);
+            }
+
         }
 
         public string GetNewProductID(string productName)
